@@ -37,26 +37,20 @@ def parse_do_statements(data: str, verbose = False) -> list[str]:
             time.sleep(0.01)
 
         if len(read_data) >= 4 and read_data[-4:] == "do()":
-            if in_do:
-                if verbose:
-                    print("In do: False")
-                do_statement = ""
-            else:
-                if verbose:
-                    print("In do: True")
-                in_do = True
+            if verbose:
+                print("In do: True")
+            in_do = True
         elif len(read_data) >= 7 and read_data[-7:] == "don't()":
-            if in_do:
-                do_statement = do_statement.replace("don't()", "")
-                
-                if verbose:
-                    print(f"Appending {do_statement} to result")
-                    print("In do: False")
+            do_statement = do_statement.replace("don't()", "")
+            
+            if verbose:
+                print(f"Appending {do_statement} to result")
+                print("In do: False")
 
-                result.append(do_statement)
-                
-                in_do = False
-                do_statement = ""
+            result.append(do_statement)
+            
+            in_do = False
+            do_statement = ""
 
     return result
         
@@ -71,8 +65,6 @@ def solve() -> None:
     data = "do()" + data + "don't()"
 
     parsed_dos = parse_do_statements(data)
-
-    print(parsed_dos)
 
     result = 0
     for do in parsed_dos:
