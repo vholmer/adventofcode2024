@@ -1,8 +1,9 @@
 import re, time
 
+
 def mul_sum(data: str) -> int:
     muls = re.findall(r"mul\(\d+,\d+\)", data)
-    
+
     mul_sum = 0
     for mul in muls:
         x, y = mul.split("(")[1].split(")")[0].split(",")
@@ -11,14 +12,15 @@ def mul_sum(data: str) -> int:
 
     return mul_sum
 
-def parse_do_statements(data: str, verbose = False) -> list[str]:
+
+def parse_do_statements(data: str, verbose=False) -> list[str]:
     read_data = ""
     print_data = ""
     do_statement = ""
     result = []
-    
+
     in_do = False
-    
+
     for i, char in enumerate(data):
         read_data += char
 
@@ -28,8 +30,8 @@ def parse_do_statements(data: str, verbose = False) -> list[str]:
         if verbose:
             middle = len(read_data) - 1 // 2
             offset = 100
-            lower = max(middle-offset, 0)
-            upper = min(middle+offset, len(read_data) - 1)
+            lower = max(middle - offset, 0)
+            upper = min(middle + offset, len(read_data) - 1)
             print_data = read_data[lower:upper]
 
         if verbose:
@@ -42,18 +44,19 @@ def parse_do_statements(data: str, verbose = False) -> list[str]:
             in_do = True
         elif len(read_data) >= 7 and read_data[-7:] == "don't()":
             do_statement = do_statement.replace("don't()", "")
-            
+
             if verbose:
                 print(f"Appending {do_statement} to result")
                 print("In do: False")
 
             result.append(do_statement)
-            
+
             in_do = False
             do_statement = ""
 
     return result
-        
+
+
 def solve() -> None:
     with open("data/3/data.txt", "r") as f:
         data = f.read().replace("\n", "")
