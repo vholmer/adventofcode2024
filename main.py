@@ -3,6 +3,7 @@ from src import (
     day2,
     day3,
     day4,
+    day5,
 )
 
 def main():
@@ -10,6 +11,7 @@ def main():
     day2.solve()
     day3.solve()
     day4.solve()
+    day5.solve()
 
 if __name__ == "__main__":
     main()
