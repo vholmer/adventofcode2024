@@ -21,6 +21,9 @@ class Guard:
     def pos(self) -> tuple[int, int]:
         return self.x, self.y
 
+    def dirpos(self) -> tuple[int, int, Direction]:
+        return self.x, self.y, self.direction
+
     def char(self) -> str:
         if self.direction == Direction.UP:
             return "^"
@@ -79,6 +82,7 @@ class World:
     _size: int
     guard: Guard
     path: set[tuple[int, int]]
+    dirpath: set[tuple[int, int, Direction]]
 
     def _initialize_map(self) -> None:
         with open("data/6/data.txt", "r") as f:
@@ -97,6 +101,7 @@ class World:
     def __init__(self):
         self._raw = []
         self.path = set()
+        self.dirpath = set()
 
         self._initialize_map()
 
@@ -133,9 +138,14 @@ class World:
 
             if self._raw[y][x].is_wall():
                 self.guard.turn()
+            else:
+                # Simulate a wall here, and see if it leads to a loop!
+                pass
 
             # Add guard pos to set and move
             self.path.add(self.guard.pos())
+            self.dirpath.add(self.guard.dirpos())
+
             self.guard.move()
 
 
