@@ -1,5 +1,5 @@
 from enum import Enum
-
+import time
 
 class Direction(Enum):
     UP = 0
@@ -100,6 +100,7 @@ class World:
 
     def __init__(self):
         self._raw = []
+        self.num_loops = 0
         self.path = set()
         self.dirpath = set()
 
@@ -122,6 +123,77 @@ class World:
         g = self.guard
         return g.x >= 0 and g.x < self._size and g.y >= 0 and g.y < self._size
 
+    def wall_to_the_right(self) -> bool:
+        right_dir_int = (int(self.guard.direction.value) + 1) % 4
+        right_dir = Direction(right_dir_int)
+
+        if right_dir == Direction.UP:
+            for i in range(self.guard.y, -1, -1):
+                if self._raw[i][self.guard.x].is_wall():
+                    return True
+        elif right_dir == Direction.RIGHT:
+            for i in range(self.guard.x, self._size, 1):
+                if self._raw[self.guard.y][i].is_wall():
+                    return True
+        elif right_dir == Direction.DOWN:
+            for i in range(self.guard.y, self._size, 1):
+                if self._raw[i][self.guard.x].is_wall():
+                    return True
+        elif right_dir == Direction.LEFT:
+            for i in range(self.guard.x, -1, -1):
+                if self._raw[self.guard.y][i].is_wall():
+                    return True
+        return False
+
+    def move_guard_to_wall(self) -> None:
+        if self.guard.direction == Direction.UP:
+            for i in range(self.guard.y, -1, -1):
+                if self._raw[i][self.guard.x].is_wall():
+                    self.guard.y = i + 1
+                    return
+        elif self.guard.direction == Direction.RIGHT:
+            for i in range(self.guard.x, self._size, 1):
+                if self._raw[self.guard.y][i].is_wall():
+                    self.guard.x = i - 1
+                    return
+        elif self.guard.direction == Direction.DOWN:
+            for i in range(self.guard.y, self._size, 1):
+                if self._raw[i][self.guard.x].is_wall():
+                    self.guard.y = i - 1
+                    return
+        elif self.guard.direction == Direction.LEFT:
+            for i in range(self.guard.x, -1, -1):
+                if self._raw[self.guard.y][i].is_wall():
+                    self.guard.x = i + 1
+                    return
+
+        # Just move guard out of bounds because no wall
+        self.guard.x = -10
+        self.guard.y = -10
+
+    def check_intersect(self, a: tuple[int, int, Direction], saved: tuple[int, int, Direction]) -> bool:
+        a_x = a[0]
+        a_y = a[1]
+        a_dir = a[2]
+
+        saved_x = saved[0]
+        saved_y = saved[1]
+        saved_dir = saved[2]
+
+        if a_dir != saved_dir:
+            return False
+
+        if a_dir == Direction.UP:
+            return saved_y < a_y and saved_x == a_x
+        elif a_dir == Direction.RIGHT:
+            return saved_x > a_x and saved_y == a_y
+        elif a_dir == Direction.DOWN:
+            return saved_y > a_y and saved_x == a_x
+        elif a_dir == Direction.LEFT:
+            return saved_x < a_x and saved_y == a_y
+
+        return False
+
     def walk(self) -> None:
         while self.guard_inside():
             # print(self)
@@ -138,9 +210,37 @@ class World:
 
             if self._raw[y][x].is_wall():
                 self.guard.turn()
-            else:
+            elif self.wall_to_the_right():
                 # Simulate a wall here, and see if it leads to a loop!
-                pass
+                # Only do this if wall is on same row to the right as guard
+                save_dirpos = self.guard.dirpos()
+
+                self.guard.turn()
+
+                while self.guard.dirpos() != save_dirpos and self.guard_inside():
+                    x, y = self.guard.get_next()
+                    
+                    x = max(0, x)
+                    x = min(x, self._size - 1)
+        
+                    y = max(0, y)
+                    y = min(y, self._size - 1)
+
+                    if self._raw[y][x].is_wall():
+                        self.guard.turn()
+
+                    # Check if we WILL hit save_dirpos, not if current
+                    # dirpos is equal to save_dirpos as with regular move
+                    if self.check_intersect(self.guard.dirpos(), save_dirpos):
+                    #if self.guard.dirpos() == save_dirpos:
+                        self.num_loops += 1
+                        break
+
+                    self.move_guard_to_wall()
+
+                self.guard.x = save_dirpos[0]
+                self.guard.y = save_dirpos[1]
+                self.guard.direction = save_dirpos[2]
 
             # Add guard pos to set and move
             self.path.add(self.guard.pos())
@@ -155,3 +255,4 @@ def solve() -> None:
     world.walk()
 
     print(f"6A: {len(world.path)}")
+    print(f"6B: {world.num_loops}")
