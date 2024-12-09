@@ -87,7 +87,7 @@ class World:
     dirpath: set[tuple[int, int, Direction]]
 
     def _initialize_map(self) -> None:
-        with open("data/6/data.txt", "r") as f:
+        with open("data/6/test2.txt", "r") as f:
             for y, line in enumerate(f):
                 row = []
                 for x, char in enumerate(line):
