@@ -221,8 +221,6 @@ class World:
                 
                 visited = self.guard.dirpos() in simulation_path
 
-                num_iterations = 0
-
                 while self.guard.dirpos() != save_dirpos and self.guard_inside():
                     x, y = self.guard.get_next()
                     
