@@ -173,6 +173,28 @@ class World:
         self.guard.x = -10
         self.guard.y = -10
 
+    def find_next_stone(self, dirpos: tuple[int, int, Direction]) -> Tile:
+        x, y, direction = dirpos
+
+        if direction == Direction.UP:
+            for i in range(y, -1, -1):
+                if self._raw[i][x].is_wall():
+                    return self._raw[i][x]
+        elif direction == Direction.RIGHT:
+            for i in range(x, self._size, 1):
+                if self._raw[y][i].is_wall():
+                    return self._raw[y][i]
+        elif direction == Direction.DOWN:
+            for i in range(y, self._size, 1):
+                if self._raw[i][x].is_wall():
+                    return self._raw[i][x]
+        elif direction == Direction.LEFT:
+            for i in range(x, -1, -1):
+                if self._raw[y][i].is_wall():
+                    return self._raw[y][i]
+
+        return None
+
     def check_intersect(self, a: tuple[int, int, Direction], saved: tuple[int, int, Direction]) -> bool:
         a_x = a[0]
         a_y = a[1]
@@ -186,13 +208,39 @@ class World:
             return False
 
         if a_dir == Direction.UP:
-            return saved_y <= a_y and saved_x == a_x
+            s = self.find_next_stone(a)
+            
+            saved_above_a = saved_y <= a_y
+            same_x = saved_x == a_x
+            stone_between = a_y > s.y > saved_y if s else False
+            
+            return saved_above_a and same_x and not stone_between
         elif a_dir == Direction.RIGHT:
-            return saved_x >= a_x and saved_y == a_y
+            s = self.find_next_stone(a)
+                        
+            saved_right_of_a = saved_x >= a_x
+            same_y = saved_y == a_y
+
+            stone_between = a_x < s.x < saved_x if s else False
+        
+            return saved_right_of_a and same_y and not stone_between
         elif a_dir == Direction.DOWN:
-            return saved_y >= a_y and saved_x == a_x
+            s = self.find_next_stone(a)
+                        
+            saved_below_a = saved_y >= a_y
+            same_x = saved_x == a_x
+            stone_between = a_y < s.y < saved_y if s else False
+        
+            return saved_below_a and same_x and not stone_between
         elif a_dir == Direction.LEFT:
-            return saved_x <= a_x and saved_y == a_y
+            s = self.find_next_stone(a)
+                                    
+            saved_left_of_a = saved_x <= a_x
+            same_y = saved_y == a_y
+
+            stone_between = a_x > s.x > saved_x if s else False
+        
+            return saved_left_of_a and same_y and not stone_between
 
         return False
 
