@@ -260,6 +260,7 @@ class World:
 
             if self._raw[y][x].is_wall():
                 self.guard.turn()
+                continue
             elif self.wall_to_the_right():
                 # Simulate a wall here, and see if it leads to a loop!
                 # Only do this if wall is on same row to the right as guard
