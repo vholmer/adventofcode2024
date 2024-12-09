@@ -80,6 +80,7 @@ class Tile:
 class World:
     _raw: list[list[Tile]]
     _size: int
+    stones: list[tuple[int, int]]
     guard: Guard
     path: set[tuple[int, int]]
     dirpath: set[tuple[int, int, Direction]]
@@ -100,6 +101,7 @@ class World:
 
     def __init__(self):
         self._raw = []
+        self.stones = set()
         self.num_loops = 0
         self.path = set()
         self.dirpath = set()
@@ -215,6 +217,8 @@ class World:
                 # Only do this if wall is on same row to the right as guard
                 save_dirpos = self.guard.dirpos()
 
+                stone_pos = self.guard.get_next()
+
                 self.guard.turn()
 
                 simulation_path = set()
@@ -239,6 +243,7 @@ class World:
                     # dirpos is equal to save_dirpos as with regular move
                     if self.check_intersect(self.guard.dirpos(), save_dirpos):
                         self.num_loops += 1
+                        self.stones.add(stone_pos)
                         break
 
                     if not visited:
@@ -266,3 +271,4 @@ def solve() -> None:
 
     print(f"6A: {len(world.path)}")
     print(f"6B: {world.num_loops}")
+    print(len(world.stones))
