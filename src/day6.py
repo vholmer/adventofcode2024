@@ -101,9 +101,9 @@ class World:
 
     def __init__(self):
         self._raw = []
-        self.stones = set()
         self.num_loops = 0
         self.path = set()
+        self.loops = []
         self.dirpath = set()
 
         self._initialize_map()
@@ -291,7 +291,7 @@ class World:
                     # dirpos is equal to save_dirpos as with regular move
                     if self.check_intersect(self.guard.dirpos(), save_dirpos):
                         self.num_loops += 1
-                        self.stones.add(stone_pos)
+                        self.loops.append((stone_pos, simulation_path))
                         break
 
                     if not visited:
@@ -319,4 +319,3 @@ def solve() -> None:
 
     print(f"6A: {len(world.path)}")
     print(f"6B: {world.num_loops}")
-    print(len(world.stones))
