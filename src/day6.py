@@ -1,6 +1,7 @@
 from enum import Enum
 import time
 
+
 class Direction(Enum):
     UP = 0
     RIGHT = 1
@@ -195,7 +196,9 @@ class World:
 
         return None
 
-    def check_intersect(self, a: tuple[int, int, Direction], saved: tuple[int, int, Direction]) -> bool:
+    def check_intersect(
+        self, a: tuple[int, int, Direction], saved: tuple[int, int, Direction]
+    ) -> bool:
         a_x = a[0]
         a_y = a[1]
         a_dir = a[2]
@@ -209,37 +212,37 @@ class World:
 
         if a_dir == Direction.UP:
             s = self.find_next_stone(a)
-            
+
             saved_above_a = saved_y <= a_y
             same_x = saved_x == a_x
             stone_between = a_y > s.y > saved_y if s else False
-            
+
             return saved_above_a and same_x and not stone_between
         elif a_dir == Direction.RIGHT:
             s = self.find_next_stone(a)
-                        
+
             saved_right_of_a = saved_x >= a_x
             same_y = saved_y == a_y
 
             stone_between = a_x < s.x < saved_x if s else False
-        
+
             return saved_right_of_a and same_y and not stone_between
         elif a_dir == Direction.DOWN:
             s = self.find_next_stone(a)
-                        
+
             saved_below_a = saved_y >= a_y
             same_x = saved_x == a_x
             stone_between = a_y < s.y < saved_y if s else False
-        
+
             return saved_below_a and same_x and not stone_between
         elif a_dir == Direction.LEFT:
             s = self.find_next_stone(a)
-                                    
+
             saved_left_of_a = saved_x <= a_x
             same_y = saved_y == a_y
 
             stone_between = a_x > s.x > saved_x if s else False
-        
+
             return saved_left_of_a and same_y and not stone_between
 
         return False
@@ -271,15 +274,15 @@ class World:
                 self.guard.turn()
 
                 simulation_path = set()
-                
+
                 visited = self.guard.dirpos() in simulation_path
 
                 while self.guard.dirpos() != save_dirpos and self.guard_inside():
                     x, y = self.guard.get_next()
-                    
+
                     x = max(0, x)
                     x = min(x, self._size - 1)
-        
+
                     y = max(0, y)
                     y = min(y, self._size - 1)
 
