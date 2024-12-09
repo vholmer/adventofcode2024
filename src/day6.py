@@ -184,13 +184,13 @@ class World:
             return False
 
         if a_dir == Direction.UP:
-            return saved_y < a_y and saved_x == a_x
+            return saved_y <= a_y and saved_x == a_x
         elif a_dir == Direction.RIGHT:
-            return saved_x > a_x and saved_y == a_y
+            return saved_x >= a_x and saved_y == a_y
         elif a_dir == Direction.DOWN:
-            return saved_y > a_y and saved_x == a_x
+            return saved_y >= a_y and saved_x == a_x
         elif a_dir == Direction.LEFT:
-            return saved_x < a_x and saved_y == a_y
+            return saved_x <= a_x and saved_y == a_y
 
         return False
 
@@ -217,6 +217,12 @@ class World:
 
                 self.guard.turn()
 
+                simulation_path = set()
+                
+                visited = self.guard.dirpos() in simulation_path
+
+                num_iterations = 0
+
                 while self.guard.dirpos() != save_dirpos and self.guard_inside():
                     x, y = self.guard.get_next()
                     
@@ -229,11 +235,17 @@ class World:
                     if self._raw[y][x].is_wall():
                         self.guard.turn()
 
+                    visited = self.guard.dirpos() in simulation_path
+
                     # Check if we WILL hit save_dirpos, not if current
                     # dirpos is equal to save_dirpos as with regular move
                     if self.check_intersect(self.guard.dirpos(), save_dirpos):
-                    #if self.guard.dirpos() == save_dirpos:
                         self.num_loops += 1
+                        break
+
+                    if not visited:
+                        simulation_path.add(self.guard.dirpos())
+                    else:
                         break
 
                     self.move_guard_to_wall()
